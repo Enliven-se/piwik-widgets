@@ -44,35 +44,23 @@ let Gauge = React.createClass({
           bounce_count: data['2016']['bounce_count'],
           interaction_count: data['2016']['nb_visits'] - data['2016']['bounce_count']
         });
-        let interaction_rate = (this.state.interaction_count / this.state.visits * 100).toFixed(2);
-        console.info("interaction_rate: ${interaction_rate}%");
-        this._renderChart(interaction_rate);
-      }.bind(this),
-
-      error: function(xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
-      }.bind(this)
-    });
-  },
-
-  _renderChart(interaction_rate) {
-    var lineChart = c3.generate({
-      bindto: '#chart_1',
-      data: {
-        columns: [
-          ['data', 78.8]
-        ],
-        type: 'gauge'
-      }
-    })
-  },
-
-  render() {
-    this._renderChart();
-    return (
-      <div id = "chart_1"></div>
-    );
-  }
+    },
+    _renderChart: function(interaction_rate) {
+        var lineChart = c3.generate({
+            bindto: '#chart_1',
+            data: {
+                columns: [
+                    ['data', interaction_rate]
+                ],
+                type: 'gauge'
+            }
+        })
+    },
+    render: function() {
+        return ( <
+            div id = "chart_1" > < /div>
+        );
+    }
 });
 
 class InteractionRateGuage extends React.Component {
