@@ -12,7 +12,7 @@ const HeaderStyles = {
     color: 'white'
   },
   chartAlign: {
-    alignItems: 'left'
+    align: 'left'
   }
 };
 
@@ -70,31 +70,31 @@ let Gauge = React.createClass({
           height: 180
         }
       });
-      setTimeout(() => {
-        interactionChart.load({
-          columns: [['data', 10]]
-        });
-      }, 1000);
-      setTimeout(() => {
-        interactionChart.load({
-          columns: [['data', 50]]
-        });
-      }, 2000);
-      setTimeout(() => {
-        interactionChart.load({
-          columns: [['data', 70]]
-        });
-      }, 3000);
-      setTimeout(() => {
-        interactionChart.load({
-          columns: [['data', 100]]
-        });
-      }, 4000);
-      setTimeout(() => {
-        interactionChart.load({
-          columns: [['data', interactionRate]]
-        });
-      }, 5000);
+      // setTimeout(() => {
+      //   interactionChart.load({
+      //     columns: [['data', 10]]
+      //   });
+      // }, 1000);
+      // setTimeout(() => {
+      //   interactionChart.load({
+      //     columns: [['data', 50]]
+      //   });
+      // }, 2000);
+      // setTimeout(() => {
+      //   interactionChart.load({
+      //     columns: [['data', 70]]
+      //   });
+      // }, 3000);
+      // setTimeout(() => {
+      //   interactionChart.load({
+      //     columns: [['data', 100]]
+      //   });
+      // }, 4000);
+      // setTimeout(() => {
+      //   interactionChart.load({
+      //     columns: [['data', interactionRate]]
+      //   });
+      // }, 5000);
     });
   },
 
