@@ -83,7 +83,7 @@ class InteractionRateGuage extends React.Component {
       <div>
         <header style={HeaderStyles.header}>
           <p style={HeaderStyles.date}>
-              Caratred Charts
+              Enliven Charts
           </p>
         </header>
         <div style={HeaderStyles.chartAlign}><Gauge/></div>
