@@ -1,0 +1,12 @@
+{
+  "name": "piwik-analytics",
+  "version": "0.0.1",
+  "dependencies": {
+    "react": "^15.0.1",
+    "react-router": "https://cdnjs.cloudflare.com/ajax/libs/react-router/2.4.1/ReactRouter.min.js",
+    "axios": "^0.9.1",
+    "c3": "^0.4.11",
+    "jquery": "^3.0.0"
+  },
+  "devDependencies": {}
+}

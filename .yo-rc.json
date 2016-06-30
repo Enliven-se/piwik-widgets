@@ -1,0 +1,22 @@
+{
+  "generator-fountain-react": {
+    "version": "0.5.4",
+    "props": {
+      "resolved": "/home/kalpak/softwares/node-v5.8.0-linux-x64/lib/node_modules/generator-fountain-react/generators/app/index.js",
+      "namespace": "fountain-react:app",
+      "argv": {
+        "remain": [],
+        "cooked": [],
+        "original": []
+      },
+      "skip-cache": false,
+      "skip-install": false,
+      "framework": "react",
+      "modules": "inject",
+      "css": "scss",
+      "js": "babel",
+      "sample": "techs",
+      "router": "router"
+    }
+  }
+}
