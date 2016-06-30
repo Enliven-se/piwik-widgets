@@ -19,15 +19,19 @@ const HeaderStyles = {
 let Gauge = React.createClass({
   getInitialState() {
     const state = {
-      baseAPI: "http://demo.piwik.org/index.php?",
-      interactionRateAPI: "module=API&method=API.get&format=JSON&idSite=7&period=year&date=2016-05-30,2016-06-28&date=2016-05-30%2C2016-06-28&filter_limit=false&format_metrics=1&expanded=1&token_auth=anonymous&filter_limit=30",
+      baseAPI: "http://demo.piwik.org/index.php?format=JSON&module=API&method=API.get",
+      interactionRateAPI: "&format_metrics=1&expanded=1&token_auth=anonymous",
+      period: "&period=year",
+      date: "&date=2016-01-01,2016-06-30",
+      siteId: "&idSite=7",
+      limit: "&filter_limit=true&filter_limit=30",
       dataR: ''
     };
     return state;
   },
 
   componentDidMount() {
-    this._interactionChart(this.state.baseAPI + this.state.interactionRateAPI);
+    this._interactionChart(this.state.baseAPI + this.state.interactionRateAPI + this.state.period + this.state.date + this.state.siteId + this.state.limit);
   },
 
   _getLiveData(apiLink) {
