@@ -44,7 +44,7 @@ let Gauge = React.createClass({
           interactionCount: data['2016'].nb_visits - data['2016'].bounce_count
         });
         const interactionRate = (this.state.interactionCount / this.state.visits * 100).toFixed(2);
-        console.info("interactionRate: ${interactionRate}%");
+        console.log('interactionRate: ${interactionRate}%');
         this._renderChart(interactionRate);
       }.bind(this),
       error: function (xhr, status, err) {
