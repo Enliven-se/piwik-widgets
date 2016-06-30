@@ -55,14 +55,13 @@ let Gauge = React.createClass({
             bindto: '#chart_1',
             data: {
                 columns: [
-                    ['data', 78.8]
+                    ['data', interaction_rate]
                 ],
                 type: 'gauge'
             }
         })
     },
     render: function() {
-        this._renderChart();
         return ( <
             div id = "chart_1" > < /div>
         );
