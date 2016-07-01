@@ -16,22 +16,26 @@ const HeaderStyles = {
   }
 };
 
-let Gauge = React.createClass({
-  getInitialState() {
-    const state = {
-      baseAPI: "http://demo.piwik.org/index.php?format=JSON&module=API&method=API.get",
-      interactionRateAPI: "&format_metrics=1&expanded=1&token_auth=anonymous",
-      period: "&period=year",
-      date: "&date=2016-01-01,2016-06-30",
-      siteId: "&idSite=7",
-      limit: "&filter_limit=true&filter_limit=30",
-      dataR: ''
-    };
-    return state;
+const InteractionRateGuage = React.createClass({
+  propTypes: {
+    baseAPI: React.PropTypes.string,
+    authtoken: React.PropTypes.string,
+    period: React.PropTypes.string,
+    date: React.PropTypes.string,
+    fromDate: React.PropTypes.string,
+    toDate: React.PropTypes.string,
+    siteId: React.PropTypes.string
   },
 
   componentDidMount() {
-    this._interactionChart(this.state.baseAPI + this.state.interactionRateAPI + this.state.period + this.state.date + this.state.siteId + this.state.limit);
+    this._interactionChart(
+      this.props.baseAPI +
+      this.props.authtoken + "&period=" +
+      this.props.period + "&date=" +
+      this.props.fromDate + "," +
+      this.props.toDate + "&idSite=" +
+      this.props.siteId
+    );
   },
 
   _getLiveData(apiLink) {
@@ -42,13 +46,10 @@ let Gauge = React.createClass({
       crossDomain: true,
       success: function (data) {
         console.log(`data received from api: ${apiLink} is \n ${JSON.stringify(data)}`);
-        this.setState({
-          dataR: data
-        });
-      }.bind(this),
+      }.bind(),
       error: function (xhr, status, err) {
         console.error(this.props, status, err.toString());
-      }.bind(this)
+      }.bind()
     });
   },
 
@@ -74,42 +75,9 @@ let Gauge = React.createClass({
           height: 180
         }
       });
-      // setTimeout(() => {
-      //   interactionChart.load({
-      //     columns: [['data', 10]]
-      //   });
-      // }, 1000);
-      // setTimeout(() => {
-      //   interactionChart.load({
-      //     columns: [['data', 50]]
-      //   });
-      // }, 2000);
-      // setTimeout(() => {
-      //   interactionChart.load({
-      //     columns: [['data', 70]]
-      //   });
-      // }, 3000);
-      // setTimeout(() => {
-      //   interactionChart.load({
-      //     columns: [['data', 100]]
-      //   });
-      // }, 4000);
-      // setTimeout(() => {
-      //   interactionChart.load({
-      //     columns: [['data', interactionRate]]
-      //   });
-      // }, 5000);
     });
   },
 
-  render() {
-    return (
-      <div id="chart_1"></div>
-    );
-  }
-});
-
-class InteractionRateGuage extends React.Component {
   render() {
     return (
       <div>
@@ -118,8 +86,8 @@ class InteractionRateGuage extends React.Component {
               Enliven Charts
           </p>
         </header>
-        <div style={HeaderStyles.chartAlign}><Gauge/></div>
+        <div style={HeaderStyles.chartAlign} id="chart_1"></div>
       </div>
     );
   }
-}
+});
