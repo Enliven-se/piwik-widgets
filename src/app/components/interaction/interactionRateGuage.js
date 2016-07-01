@@ -28,14 +28,7 @@ const InteractionRateGuage = React.createClass({
   },
 
   componentDidMount() {
-    this._interactionChart(
-      this.props.baseAPI +
-      this.props.authtoken + "&period=" +
-      this.props.period + "&date=" +
-      this.props.fromDate + "," +
-      this.props.toDate + "&idSite=" +
-      this.props.siteId
-    );
+    this._interactionChart(`${this.props.baseAPI}${this.props.authtoken}&period=${this.props.period}&date=${this.props.fromDate},${this.props.toDate}&idSite=${this.props.siteId}`);
   },
 
   _getLiveData(apiLink) {
@@ -54,7 +47,7 @@ const InteractionRateGuage = React.createClass({
   },
 
   _interactionChart(apiLink) {
-    this._getLiveData(apiLink).done(function (data) {
+    this._getLiveData(apiLink).done(data => {
       const interactionRate = ((data['2016'].nb_visits - data['2016'].bounce_count) / data['2016'].nb_visits * 100).toFixed(2);
       console.log(`interactionRate: ${interactionRate}%`);
       const interactionChart = c3.generate({
