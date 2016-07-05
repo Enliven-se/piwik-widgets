@@ -4,12 +4,12 @@ const browserHistory = ReactRouter.browserHistory;
 
 ReactDOM.render(
   <InteractionRateGuage
-    baseAPI="http://demo.piwik.org/index.php?format=JSON&module=API&method=API.get&format_metrics=1&expanded=1&token_auth="
-    authtoken="anonymous"
+    baseAPI="http://duskywing.enliven.se/index.php?module=API&method=API.get&format=JSON&&token_auth="
+    authtoken="e06756f6aaccba2f6da411342f2fecfa"
     period="year"
     fromDate="2016-01-01"
-    toDate="2016-06-30"
-    siteId="7"
+    toDate="2016-07-04"
+    siteId="1"
     />,
   document.getElementById('root')
 );

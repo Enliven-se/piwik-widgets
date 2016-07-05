@@ -24,11 +24,19 @@ const InteractionRateGuage = React.createClass({
     date: React.PropTypes.string,
     fromDate: React.PropTypes.string,
     toDate: React.PropTypes.string,
-    siteId: React.PropTypes.string
+    siteId: React.PropTypes.string,
+    offlineData: React.PropTypes.arrayOf(React.PropTypes.string)
+  },
+
+  getDefaultProps() {
+    return {
+      //  offlineData: {"2016": {"nb_visits": 18, "bounce_count": 9}}
+    };
   },
 
   componentDidMount() {
     this._interactionChart(`${this.props.baseAPI}${this.props.authtoken}&period=${this.props.period}&date=${this.props.fromDate},${this.props.toDate}&idSite=${this.props.siteId}`);
+    //  this._lineChart(this.state);
   },
 
   _getLiveData(apiLink) {
@@ -80,6 +88,7 @@ const InteractionRateGuage = React.createClass({
           </p>
         </header>
         <div style={HeaderStyles.chartAlign} id="chart_1"></div>
+        <div style={HeaderStyles.chartAlign} id="chart_2"></div>
       </div>
     );
   }
