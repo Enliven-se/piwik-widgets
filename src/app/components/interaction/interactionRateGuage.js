@@ -1,28 +1,20 @@
-const HeaderStyles = {
-  header: {
-    display: 'flex',
-    alignItems: 'center',
-    backgroundColor: '#1f1f1f'
-  },
-  date: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: '1.5rem',
-    margin: '1rem',
-    color: 'white'
-  },
-  chartAlign: {
-    align: 'left'
-  }
-};
-
-class InteractionRateGuage extends React.Component {
-  componentDidMount() {
-    this._interactionChart(`${this.props.baseAPI}${this.props.authtoken}&period=${this.props.period}&date=${this.props.fromDate},${this.props.toDate}&idSite=${this.props.siteId}`);
-    //  this._lineChart(this.state);
+class PiwikAPI {
+  constructor(baseAPI, authtoken, period, fromDate, toDate, siteId) {
+    this.baseAPI = baseAPI;
+    this.authtoken = authtoken;
+    this.period = period;
+    this.fromDate = fromDate;
+    this.toDate = toDate;
+    this.siteId = siteId;
   }
 
-  _getLiveData(apiLink) {
+  generalMetrics() {
+    const apiLink = `${this.baseAPI}${this.authtoken}&period=${this.period}&date=${this.fromDate},${this.toDate}&idSite=${this.siteId}`;
+    console.log(`api link constructed is: ${apiLink}`);
+    return this.ajaxCall(apiLink);
+  }
+
+  ajaxCall(apiLink) {
     return $.ajax({
       url: apiLink,
       dataType: 'jsonp',
@@ -36,27 +28,82 @@ class InteractionRateGuage extends React.Component {
       }.bind()
     });
   }
+}
 
-  _interactionChart(apiLink) {
-    this._getLiveData(apiLink).done(data => {
+const HeaderStyles = {
+  header: {
+    display: 'flex',
+    alignItems: 'center',
+    backgroundColor: '#1f1f1f'
+  },
+  date: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: '1.5rem',
+    margin: '1rem',
+    color: 'white'
+  },
+  charts: {
+    flex: 1,
+    textAlign: 'left',
+    fontSize: '1rem',
+    margin: '1rem',
+    align: 'left'
+  }
+};
+
+class InteractionRateGuage extends React.Component {
+  componentDidMount() {
+    this._interactionChart();
+    //  this._timeseriesChart("http://duskywing.enliven.se/index.php?module=API&method=API.get&format=JSON&&token_auth=e06756f6aaccba2f6da411342f2fecfa&period=day&date=2016-06-28,today&idSite=1");
+  }
+
+  _interactionChart() {
+    const piwikapi = new PiwikAPI(this.props.baseAPI, this.props.authtoken, this.props.period, this.props.fromDate, this.props.toDate, this.props.siteId);
+    piwikapi.generalMetrics().done(data => {
       const interactionRate = ((data['2016'].nb_visits - data['2016'].bounce_count) / data['2016'].nb_visits * 100).toFixed(2);
-      console.log(`interactionRate: ${interactionRate}%`);
-      const interactionChart = c3.generate({
+      c3.generate({
         bindto: '#chart_1',
         data: {
           columns: [
             ['data', interactionRate]
           ],
           type: 'gauge'
+        }
+      });
+      c3.generate({
+        bindto: '#chart_2',
+        data: {
+          columns: [
+            ['data', data['2016'].bounce_rate.replace("%", "")]
+          ],
+          type: 'gauge'
+        }
+      });
+    });
+  }
+
+  _timeseriesChart() {
+    this._getLiveData().done(data => {
+      const interactionRate = ((data['2016'].nb_visits - data['2016'].bounce_count) / data['2016'].nb_visits * 100).toFixed(2);
+      console.log(`interactionRate: ${interactionRate}%`);
+      c3.generate({
+        bindto: '#chart_3',
+        data: {
+          x: 'x',
+          columns: [
+            ['x', '2013-01-01', '2013-01-02', '2013-01-03', '2013-01-04', '2013-01-05', '2013-01-06', '2013-01-07'],
+            ['data1', 30, 200, 100, 400, 150, 250, 350],
+            ['data2', 130, 340, 200, 500, 250, 350, 450]
+          ]
         },
-        color: {
-          pattern: ['#FF0000', '#F97600', '#F6C600', '#60B044'],
-          threshold: {
-            values: [30, 60, 90, 100]
+        axis: {
+          x: {
+            type: 'timeseries',
+            tick: {
+              format: '%Y-%m-%d'
+            }
           }
-        },
-        size: {
-          height: 180
         }
       });
     });
@@ -70,7 +117,18 @@ class InteractionRateGuage extends React.Component {
               Enliven Charts
           </p>
         </header>
-        <div style={HeaderStyles.chartAlign} id="chart_1"></div>
+        <div>
+          <p style={HeaderStyles.charts}>Interaction Rate Guage</p>
+          <div id="chart_1"></div>
+        </div>
+        <div>
+          <p style={HeaderStyles.charts}>Bounce Rate Guage</p>
+          <div id="chart_2"></div>
+        </div>
+        <div>
+          <p style={HeaderStyles.charts}>Impression's, Interaction's timeseries</p>
+          <div id="chart_3"></div>
+        </div>
       </div>
     );
   }
