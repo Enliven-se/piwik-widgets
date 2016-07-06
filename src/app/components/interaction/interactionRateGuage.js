@@ -1,16 +1,11 @@
 class PiwikAPI {
-  constructor(baseAPI, authtoken, period, fromDate, toDate, siteId) {
+  constructor(baseAPI, authtoken) {
     this.baseAPI = baseAPI;
     this.authtoken = authtoken;
-    this.period = period;
-    this.fromDate = fromDate;
-    this.toDate = toDate;
-    this.siteId = siteId;
   }
 
-  generalMetrics() {
-    const apiLink = `${this.baseAPI}${this.authtoken}&period=${this.period}&date=${this.fromDate},${this.toDate}&idSite=${this.siteId}`;
-    console.log(`api link constructed is: ${apiLink}`);
+  generalMetrics(period, fromDate, toDate, siteId, method) {
+    const apiLink = `${this.baseAPI}${this.authtoken}&period=${period}&date=${fromDate},${toDate}&idSite=${siteId}&method=${method}`;
     return this.ajaxCall(apiLink);
   }
 
@@ -54,14 +49,16 @@ const HeaderStyles = {
 
 class InteractionRateGuage extends React.Component {
   componentDidMount() {
-    this._interactionChart();
-    //  this._timeseriesChart("http://duskywing.enliven.se/index.php?module=API&method=API.get&format=JSON&&token_auth=e06756f6aaccba2f6da411342f2fecfa&period=day&date=2016-06-28,today&idSite=1");
+    this._renderCharts();
   }
 
-  _interactionChart() {
-    const piwikapi = new PiwikAPI(this.props.baseAPI, this.props.authtoken, this.props.period, this.props.fromDate, this.props.toDate, this.props.siteId);
-    piwikapi.generalMetrics().done(data => {
-      const interactionRate = ((data['2016'].nb_visits - data['2016'].bounce_count) / data['2016'].nb_visits * 100).toFixed(2);
+  _renderCharts() {
+    const piwikapi = new PiwikAPI(this.props.baseAPI, this.props.authtoken);
+
+    piwikapi.generalMetrics("year", this.props.fromDate, this.props.toDate, this.props.siteId, this.props.method).done(data => {
+      const interactions = data['2016'].nb_visits - data['2016'].bounce_count;
+      const interactionRate = (interactions / data['2016'].nb_visits * 100).toFixed(2);
+
       c3.generate({
         bindto: '#chart_1',
         data: {
@@ -71,6 +68,7 @@ class InteractionRateGuage extends React.Component {
           type: 'gauge'
         }
       });
+
       c3.generate({
         bindto: '#chart_2',
         data: {
@@ -81,20 +79,31 @@ class InteractionRateGuage extends React.Component {
         }
       });
     });
-  }
 
-  _timeseriesChart() {
-    this._getLiveData().done(data => {
-      const interactionRate = ((data['2016'].nb_visits - data['2016'].bounce_count) / data['2016'].nb_visits * 100).toFixed(2);
-      console.log(`interactionRate: ${interactionRate}%`);
+    piwikapi.generalMetrics("day", this.props.fromDate, this.props.toDate, this.props.siteId, this.props.method).done(data => {
+      const dateArr = ['x'];
+      const interactionArr = ['nb_interactions'];
+      const impressionArr = ['nb_impressions'];
+      for (const value in data) {
+        if (data.hasOwnProperty(value)) {
+          dateArr.push(value);
+          if (jQuery.isEmptyObject(data[value])) {
+            impressionArr.push(0);
+            interactionArr.push(0);
+          } else {
+            impressionArr.push(data[value].nb_visits);
+            interactionArr.push(data[value].nb_visits - data[value].bounce_count);
+          }
+        }
+      }
       c3.generate({
         bindto: '#chart_3',
         data: {
           x: 'x',
           columns: [
-            ['x', '2013-01-01', '2013-01-02', '2013-01-03', '2013-01-04', '2013-01-05', '2013-01-06', '2013-01-07'],
-            ['data1', 30, 200, 100, 400, 150, 250, 350],
-            ['data2', 130, 340, 200, 500, 250, 350, 450]
+            dateArr,
+            impressionArr,
+            interactionArr
           ]
         },
         axis: {
@@ -104,6 +113,50 @@ class InteractionRateGuage extends React.Component {
               format: '%Y-%m-%d'
             }
           }
+        }
+      });
+    });
+
+    piwikapi.generalMetrics("year", this.props.fromDate, this.props.toDate, this.props.siteId, "UserCountry.getCountry").done(data => {
+      const arr = [];
+      let temp = [];
+      const another = data[new Date().getFullYear()];
+      for (const value of another) {
+        temp.push(value.label);
+        temp.push(value.nb_visits);
+        arr.push(temp);
+        temp = [];
+      }
+      c3.generate({
+        bindto: '#chart_4',
+        data: {
+          columns: arr,
+          type: 'donut'
+        },
+        size: {
+          height: 480
+        }
+      });
+    });
+
+    piwikapi.generalMetrics("year", this.props.fromDate, this.props.toDate, this.props.siteId, "UserCountry.getCity").done(data => {
+      const arr = [];
+      let temp = [];
+      const another = data[new Date().getFullYear()];
+      for (const value of another) {
+        temp.push(value.label);
+        temp.push(value.nb_visits);
+        arr.push(temp);
+        temp = [];
+      }
+      c3.generate({
+        bindto: '#chart_5',
+        data: {
+          columns: arr,
+          type: 'donut'
+        },
+        size: {
+          height: 700
         }
       });
     });
@@ -129,6 +182,14 @@ class InteractionRateGuage extends React.Component {
           <p style={HeaderStyles.charts}>Impression's, Interaction's timeseries</p>
           <div id="chart_3"></div>
         </div>
+        <div>
+          <p style={HeaderStyles.charts}>Countrywise impression's donut</p>
+          <div id="chart_4"></div>
+        </div>
+        <div>
+          <p style={HeaderStyles.charts}>Citywise impression's donut</p>
+          <div id="chart_5"></div>
+        </div>
       </div>
     );
   }
@@ -142,6 +203,7 @@ InteractionRateGuage.propTypes = {
   fromDate: React.PropTypes.string,
   toDate: React.PropTypes.string,
   siteId: React.PropTypes.string,
+  method: React.PropTypes.string,
   offlineData: React.PropTypes.arrayOf(React.PropTypes.string)
 };
 InteractionRateGuage.defaultProps = {
