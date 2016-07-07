@@ -1,4 +1,4 @@
-class InteractionRateGuage extends React.Component {
+class DisplayCharts extends React.Component {
 
   componentDidMount() {
     // Need local config file "src/piwik/configure.js" to construct cofig object
@@ -114,27 +114,17 @@ class InteractionRateGuage extends React.Component {
     return (
       <div>
         <header style={HeaderStyles.header}>
-          <p style={HeaderStyles.date}>
-              Enliven Charts
-          </p>
+          <p style={HeaderStyles.date}>Enliven Charts</p>
         </header>
         <div>
           <p style={HeaderStyles.charts}>Interaction Rate Guage</p>
           <div id="chart_1"></div>
-        </div>
-        <div>
           <p style={HeaderStyles.charts}>Bounce Rate Guage</p>
           <div id="chart_2"></div>
-        </div>
-        <div>
           <p style={HeaderStyles.charts}>Impression's, Interaction's timeseries</p>
           <div id="chart_3"></div>
-        </div>
-        <div>
           <p style={HeaderStyles.charts}>Countrywise impression's donut</p>
           <div id="chart_4"></div>
-        </div>
-        <div>
           <p style={HeaderStyles.charts}>Citywise impression's donut</p>
           <div id="chart_5"></div>
         </div>
@@ -143,7 +133,7 @@ class InteractionRateGuage extends React.Component {
   }
 }
 
-InteractionRateGuage.propTypes = {
+DisplayCharts.propTypes = {
   baseAPI: React.PropTypes.string,
   authtoken: React.PropTypes.string,
   period: React.PropTypes.string,
@@ -151,9 +141,5 @@ InteractionRateGuage.propTypes = {
   fromDate: React.PropTypes.string,
   toDate: React.PropTypes.string,
   siteId: React.PropTypes.string,
-  method: React.PropTypes.string,
-  offlineData: React.PropTypes.arrayOf(React.PropTypes.string)
-};
-InteractionRateGuage.defaultProps = {
-  //  offlineData: {"2016": {"nb_visits": 18, "bounce_count": 9}}
+  method: React.PropTypes.string
 };

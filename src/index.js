@@ -3,7 +3,7 @@ const Route = ReactRouter.Route;
 const browserHistory = ReactRouter.browserHistory;
 
 ReactDOM.render(
-  <InteractionRateGuage
+  <DisplayCharts
     period="year"
     fromDate="2016-06-28"
     toDate="today"
