@@ -1,57 +1,20 @@
 class InteractionRateGuage extends React.Component {
 
-  // reactjs component inbuilt function which is called automatically once dom is ready
   componentDidMount() {
-    this._renderCharts();
-  }
-
-  // Utility function which is used to display all widgets
-  _renderCharts() {
     // Need local config file "src/piwik/configure.js" to construct cofig object
     const config = new Configuration();
     const piwikapi = new PiwikAPI(config.baseAPI, config.authtoken);
 
     // Piwik api callback to display interaction rate and bounce rate widgets.
-    // Year is hardcoded as widgets is used to display data for current year only
     piwikapi.generalMetrics("year", this.props.fromDate, this.props.toDate, this.props.siteId, this.props.method).done(data => {
       const year = new Date().getFullYear();
       const interactions = data[year].nb_visits - data[year].bounce_count;
       // formula to calculate interaction rate as we are not getting this from piwik api
       const interactionRate = (interactions / data[year].nb_visits * 100).toFixed(2);
-
       // C3 chart rendering to display interaction rate
-      c3.generate({
-        bindto: '#chart_1',
-        data: {
-          columns: [
-            ['data', interactionRate]
-          ],
-          type: 'gauge'
-        },
-        color: {
-          pattern: ['#FF0000', '#F97600', '#F6C600', '#60B044'],
-          threshold: {
-            values: [30, 60, 90, 100]
-          }
-        }
-      });
-
+      this._displayGuageChart('#chart_1', interactionRate);
       // C3 chart rendering to display bounce rate
-      c3.generate({
-        bindto: '#chart_2',
-        data: {
-          columns: [
-            ['data', data[year].bounce_rate.replace("%", "")]
-          ],
-          type: 'gauge'
-        },
-        color: {
-          pattern: ['#FF0000', '#F97600', '#F6C600', '#60B044'],
-          threshold: {
-            values: [30, 60, 90, 100]
-          }
-        }
-      });
+      this._displayGuageChart('#chart_2', data[year].bounce_rate.replace("%", ""));
     });
 
     // C3 chart rendering to display timeseries chart of interactions and impressions
@@ -71,71 +34,79 @@ class InteractionRateGuage extends React.Component {
           }
         }
       }
-      c3.generate({
-        bindto: '#chart_3',
-        data: {
-          x: 'x',
-          columns: [
-            dateArr,
-            impressionArr,
-            interactionArr
-          ]
-        },
-        axis: {
-          x: {
-            type: 'timeseries',
-            tick: {
-              format: '%Y-%m-%d'
-            }
-          }
-        }
-      });
+      this._displayTimeSeriesChart('#chart_3', [dateArr, impressionArr, interactionArr]);
     });
 
     // C3 chart rendering to display countrywise impressions donut chart
     piwikapi.generalMetrics("year", this.props.fromDate, this.props.toDate, this.props.siteId, "UserCountry.getCountry").done(data => {
-      const arr = [];
-      let temp = [];
-      const another = data[new Date().getFullYear()];
-      for (const value of another) {
-        temp.push(value.label);
-        temp.push(value.nb_visits);
-        arr.push(temp);
-        temp = [];
-      }
-      c3.generate({
-        bindto: '#chart_4',
-        data: {
-          columns: arr,
-          type: 'donut'
-        },
-        size: {
-          height: 480
-        }
-      });
+      this._displayDonutChart('#chart_4', this._utilityFunction(data, new Date().getFullYear()), 480);
     });
 
     // C3 chart rendering to display citywise impressions donut chart
     piwikapi.generalMetrics("year", this.props.fromDate, this.props.toDate, this.props.siteId, "UserCountry.getCity").done(data => {
-      const arr = [];
-      let temp = [];
-      const another = data[new Date().getFullYear()];
-      for (const value of another) {
-        temp.push(value.label);
-        temp.push(value.nb_visits);
-        arr.push(temp);
-        temp = [];
-      }
-      c3.generate({
-        bindto: '#chart_5',
-        data: {
-          columns: arr,
-          type: 'donut'
-        },
-        size: {
-          height: 700
+      this._displayDonutChart('#chart_5', this._utilityFunction(data, new Date().getFullYear()), 700);
+    });
+  }
+
+  _utilityFunction(data, year) {
+    const arr = [];
+    let temp = [];
+    for (const value of data[year]) {
+      temp.push(value.label);
+      temp.push(value.nb_visits);
+      arr.push(temp);
+      temp = [];
+    }
+    return arr;
+  }
+
+  // Modularising repetitive code
+  _displayGuageChart(bindTo, displayData) {
+    c3.generate({
+      bindto: bindTo,
+      data: {
+        columns: [
+          ['data', displayData]
+        ],
+        type: 'gauge'
+      },
+      color: {
+        pattern: ['#FF0000', '#F97600', '#F6C600', '#60B044'],
+        threshold: {
+          values: [30, 60, 90, 100]
         }
-      });
+      }
+    });
+  }
+
+  _displayTimeSeriesChart(bindTo, displayData) {
+    c3.generate({
+      bindto: bindTo,
+      data: {
+        x: 'x',
+        columns: displayData
+      },
+      axis: {
+        x: {
+          type: 'timeseries',
+          tick: {
+            format: '%Y-%m-%d'
+          }
+        }
+      }
+    });
+  }
+
+  _displayDonutChart(bindTo, displayData, assignHeight) {
+    c3.generate({
+      bindto: bindTo,
+      data: {
+        columns: displayData,
+        type: 'donut'
+      },
+      size: {
+        height: assignHeight
+      }
     });
   }
 
