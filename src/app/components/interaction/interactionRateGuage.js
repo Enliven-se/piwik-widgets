@@ -1,3 +1,5 @@
+const BootstrapTable = ReactBootstrap.BootstrapTable;
+
 class PiwikAPI {
   constructor(baseAPI, authtoken) {
     this.baseAPI = baseAPI;
@@ -56,8 +58,9 @@ class InteractionRateGuage extends React.Component {
     const piwikapi = new PiwikAPI(this.props.baseAPI, this.props.authtoken);
 
     piwikapi.generalMetrics("year", this.props.fromDate, this.props.toDate, this.props.siteId, this.props.method).done(data => {
-      const interactions = data['2016'].nb_visits - data['2016'].bounce_count;
-      const interactionRate = (interactions / data['2016'].nb_visits * 100).toFixed(2);
+      const year = new Date().getFullYear();
+      const interactions = data[year].nb_visits - data[year].bounce_count;
+      const interactionRate = (interactions / data[year].nb_visits * 100).toFixed(2);
 
       c3.generate({
         bindto: '#chart_1',
@@ -66,6 +69,12 @@ class InteractionRateGuage extends React.Component {
             ['data', interactionRate]
           ],
           type: 'gauge'
+        },
+        color: {
+          pattern: ['#FF0000', '#F97600', '#F6C600', '#60B044'],
+          threshold: {
+            values: [30, 60, 90, 100]
+          }
         }
       });
 
@@ -73,9 +82,15 @@ class InteractionRateGuage extends React.Component {
         bindto: '#chart_2',
         data: {
           columns: [
-            ['data', data['2016'].bounce_rate.replace("%", "")]
+            ['data', data[year].bounce_rate.replace("%", "")]
           ],
           type: 'gauge'
+        },
+        color: {
+          pattern: ['#FF0000', '#F97600', '#F6C600', '#60B044'],
+          threshold: {
+            values: [30, 60, 90, 100]
+          }
         }
       });
     });
