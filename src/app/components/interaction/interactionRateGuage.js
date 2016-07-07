@@ -29,7 +29,9 @@ class InteractionRateGuage extends React.Component {
 
   // Utility function which is used to display all widgets
   _renderCharts() {
-    const piwikapi = new PiwikAPI(this.props.baseAPI, this.props.authtoken);
+    // Need local config file "src/piwik/configure.js" to construct cofig object
+    const config = new Configuration();
+    const piwikapi = new PiwikAPI(config.baseAPI, config.authtoken);
 
     // Piwik api callback to display interaction rate and bounce rate widgets.
     // Year is hardcoded as widgets is used to display data for current year only

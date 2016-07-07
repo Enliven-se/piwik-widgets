@@ -1,5 +1,6 @@
 class PiwikAPI {
-  // class constructor with common metrics initialization
+  // Class constructor with config data initialtion
+  // Need local config file "src/piwik/configure.js" for constructor parameters
   constructor(baseAPI, authtoken) {
     this.baseAPI = baseAPI;
     this.authtoken = authtoken;
