@@ -1,32 +1,3 @@
-const BootstrapTable = ReactBootstrap.BootstrapTable;
-
-class PiwikAPI {
-  constructor(baseAPI, authtoken) {
-    this.baseAPI = baseAPI;
-    this.authtoken = authtoken;
-  }
-
-  generalMetrics(period, fromDate, toDate, siteId, method) {
-    const apiLink = `${this.baseAPI}${this.authtoken}&period=${period}&date=${fromDate},${toDate}&idSite=${siteId}&method=${method}`;
-    return this.ajaxCall(apiLink);
-  }
-
-  ajaxCall(apiLink) {
-    return $.ajax({
-      url: apiLink,
-      dataType: 'jsonp',
-      cashe: false,
-      crossDomain: true,
-      success: function (data) {
-        console.log(`data received from api: ${apiLink} is \n ${JSON.stringify(data)}`);
-      }.bind(),
-      error: function (xhr, status, err) {
-        console.error(this.props, status, err.toString());
-      }.bind()
-    });
-  }
-}
-
 const HeaderStyles = {
   header: {
     display: 'flex',
@@ -50,18 +21,25 @@ const HeaderStyles = {
 };
 
 class InteractionRateGuage extends React.Component {
+
+  // reactjs component inbuilt function which is called automatically once dom is ready
   componentDidMount() {
     this._renderCharts();
   }
 
+  // Utility function which is used to display all widgets
   _renderCharts() {
     const piwikapi = new PiwikAPI(this.props.baseAPI, this.props.authtoken);
 
+    // Piwik api callback to display interaction rate and bounce rate widgets.
+    // Year is hardcoded as widgets is used to display data for current year only
     piwikapi.generalMetrics("year", this.props.fromDate, this.props.toDate, this.props.siteId, this.props.method).done(data => {
       const year = new Date().getFullYear();
       const interactions = data[year].nb_visits - data[year].bounce_count;
+      // formula to calculate interaction rate as we are not getting this from piwik api
       const interactionRate = (interactions / data[year].nb_visits * 100).toFixed(2);
 
+      // C3 chart rendering to display interaction rate
       c3.generate({
         bindto: '#chart_1',
         data: {
@@ -78,6 +56,7 @@ class InteractionRateGuage extends React.Component {
         }
       });
 
+      // C3 chart rendering to display bounce rate
       c3.generate({
         bindto: '#chart_2',
         data: {
@@ -95,6 +74,7 @@ class InteractionRateGuage extends React.Component {
       });
     });
 
+    // C3 chart rendering to display timeseries chart of interactions and impressions
     piwikapi.generalMetrics("day", this.props.fromDate, this.props.toDate, this.props.siteId, this.props.method).done(data => {
       const dateArr = ['x'];
       const interactionArr = ['nb_interactions'];
@@ -132,6 +112,7 @@ class InteractionRateGuage extends React.Component {
       });
     });
 
+    // C3 chart rendering to display countrywise impressions donut chart
     piwikapi.generalMetrics("year", this.props.fromDate, this.props.toDate, this.props.siteId, "UserCountry.getCountry").done(data => {
       const arr = [];
       let temp = [];
@@ -154,6 +135,7 @@ class InteractionRateGuage extends React.Component {
       });
     });
 
+    // C3 chart rendering to display citywise impressions donut chart
     piwikapi.generalMetrics("year", this.props.fromDate, this.props.toDate, this.props.siteId, "UserCountry.getCity").done(data => {
       const arr = [];
       let temp = [];
