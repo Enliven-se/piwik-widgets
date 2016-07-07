@@ -4,4 +4,4 @@ dist/
 node_modules/
 jspm_packages/
 bower_components/
-src/piwik/configure.js
+src/app/piwik/configure.js
